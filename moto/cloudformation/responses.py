@@ -237,7 +237,9 @@ class CloudFormationResponse(BaseResponse):
                 break
 
         if not resource:
-            message = "Resource {0} does not exist for stack {1}".format(logical_resource_id, stack_name)
+            message = "Resource {0} does not exist for stack {1}".format(
+                logical_resource_id, stack_name
+            )
             raise ValidationError(stack_name, message)
 
         template = self.response_template(DESCRIBE_STACK_RESOURCE_RESPONSE_TEMPLATE)
