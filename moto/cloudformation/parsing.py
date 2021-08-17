@@ -652,14 +652,6 @@ class ResourceMap(collections_abc.Mapping):
 
         old_template = self._resource_json_map
         new_template = template["Resources"]
-        self._resource_json_map = new_template
-
-        for resource_name, resource in resources_by_action["Add"].items():
-            resource_json = new_template[resource_name]
-            new_resource = parse_and_create_resource(
-                resource_name, resource_json, self, self._region_name
-            )
-            self._parsed_resources[resource_name] = new_resource
 
         for logical_name, _ in resources_by_action["Remove"].items():
             resource_json = old_template[logical_name]
@@ -675,6 +667,15 @@ class ResourceMap(collections_abc.Mapping):
                 resource_name, resource_json, self, self._region_name
             )
             self._parsed_resources.pop(logical_name)
+
+        self._resource_json_map = new_template
+
+        for resource_name, resource in resources_by_action["Add"].items():
+            resource_json = new_template[resource_name]
+            new_resource = parse_and_create_resource(
+                resource_name, resource_json, self, self._region_name
+            )
+            self._parsed_resources[resource_name] = new_resource
 
         tries = 1
         while resources_by_action["Modify"] and tries < 5:
