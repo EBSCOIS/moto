@@ -84,7 +84,7 @@ class LaunchTemplateBackend:
         self.launch_templates = OrderedDict()
         self.launch_template_insert_order = []
 
-    def create_launch_template(self, name, description, template_data):
+    def create_launch_template(self, template_data, name, tag_specifications):
         if name in self.launch_template_name_to_ids:
             raise InvalidLaunchTemplateNameAlreadyExistsError()
         template = LaunchTemplate(self, name, template_data, description)
@@ -148,11 +148,14 @@ class FakeLaunchTemplate(CloudFormationModel):
 
     @classmethod
     def create_from_cloudformation_json(
-        cls, resource_name, cloudformation_json, region_name, **kwargs
+        cls, resource_name, cloudformation_json, account_id, region_name, **kwargs
     ):
         properties = cloudformation_json["Properties"]
         print(f"\n PROPERTIESSSSS: {properties}")
         ec2_backend = ec2_backends[region_name]
+        print(f"\n\n heyyyyyyyy: {launch_template_data} and {launch_template_name} and {tag_specifications}")
 
         launch_template = ec2_backend.create_launch_template(launch_template_data, launch_template_name, tag_specifications)
         return launch_template
+
+ec2_backends = BackendDict(LaunchTemplateBackend, "ec2")
