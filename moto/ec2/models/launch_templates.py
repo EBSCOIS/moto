@@ -6,6 +6,9 @@ from ..exceptions import (
     InvalidLaunchTemplateNameNotFoundError,
 )
 
+from moto.core import BaseBackend, BaseModel, CloudFormationModel
+from moto.ec2.models import ec2_backends
+
 
 class LaunchTemplateVersion(object):
     def __init__(self, template, number, data, description):
