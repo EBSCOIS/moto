@@ -122,3 +122,35 @@ class LaunchTemplateBackend:
             templates = list(self.launch_templates.values())
 
         return generic_filter(filters, templates)
+
+
+class FakeLaunchTemplate(CloudFormationModel):
+    def __init__(
+        self,
+        launch_template_data,
+        launch_template_name,
+        tag_specifications
+    ):
+        self.launch_template_data = launch_template_data
+        self.launch_template_name = launch_template_name
+        self.tag_specifications = tag_specifications
+
+    @property
+    def physical_resource_id(self):
+        return self.arn
+
+    @staticmethod
+    def cloudformation_type():
+        # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-launchtemplate.html
+        return "AWS::EC2::LaunchTemplate"
+
+    @classmethod
+    def create_from_cloudformation_json(
+        cls, resource_name, cloudformation_json, region_name
+    ):
+        properties = cloudformation_json["Properties"]
+        print(f"\n PROPERTIESSSSS: {properties}")
+        ec2_backend = ec2_backends[region_name]
+
+        launch_template = ec2_backend.create_launch_template(launch_template_data, launch_template_name, tag_specifications)
+        return launch_template
