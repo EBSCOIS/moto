@@ -7,7 +7,6 @@ from ..exceptions import (
 )
 
 from moto.core import BaseBackend, BaseModel, CloudFormationModel
-from moto.ec2.models import ec2_backends
 
 
 class LaunchTemplateVersion(object):
@@ -149,7 +148,7 @@ class FakeLaunchTemplate(CloudFormationModel):
 
     @classmethod
     def create_from_cloudformation_json(
-        cls, resource_name, cloudformation_json, region_name
+        cls, resource_name, cloudformation_json, region_name, **kwargs
     ):
         properties = cloudformation_json["Properties"]
         print(f"\n PROPERTIESSSSS: {properties}")
