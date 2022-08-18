@@ -6,7 +6,7 @@ from ..exceptions import (
     InvalidLaunchTemplateNameNotFoundError,
 )
 
-from moto.core import BaseBackend, BaseModel, CloudFormationModel
+from moto.core import CloudFormationModel
 
 
 class LaunchTemplateVersion(object):
@@ -35,7 +35,7 @@ class LaunchTemplateVersion(object):
 
 
 class LaunchTemplate(TaggedEC2Resource):
-    def __init__(self, backend, name, template_data, version_description):
+    def __init__(self, backend, name, template_data, version_description=None):
         self.ec2_backend = backend
         self.name = name
         self.id = random_launch_template_id()
@@ -50,6 +50,9 @@ class LaunchTemplate(TaggedEC2Resource):
         version = LaunchTemplateVersion(self, num, data, description)
         self.versions.append(version)
         return version
+
+    def is_created(self):
+        return True
 
     def is_default(self, version):
         return self.default_version == version.number
@@ -66,6 +69,12 @@ class LaunchTemplate(TaggedEC2Resource):
 
     def latest_version(self):
         return self.versions[-1]
+
+    def is_created(self):
+        # Verify whether the resource was created successfully
+        # Assume True after initialization
+        # Custom resources may need time after init before they are created successfully
+        return True
 
     @property
     def latest_version_number(self):
@@ -84,7 +93,7 @@ class LaunchTemplateBackend:
         self.launch_templates = OrderedDict()
         self.launch_template_insert_order = []
 
-    def create_launch_template(self, template_data, name, tag_specifications):
+    def create_launch_template(self, template_data, name, description=None):
         if name in self.launch_template_name_to_ids:
             raise InvalidLaunchTemplateNameAlreadyExistsError()
         template = LaunchTemplate(self, name, template_data, description)
@@ -150,12 +159,12 @@ class FakeLaunchTemplate(CloudFormationModel):
     def create_from_cloudformation_json(
         cls, resource_name, cloudformation_json, account_id, region_name, **kwargs
     ):
+        from ..models import ec2_backends
         properties = cloudformation_json["Properties"]
-        print(f"\n PROPERTIESSSSS: {properties}")
-        ec2_backend = ec2_backends[region_name]
-        print(f"\n\n heyyyyyyyy: {launch_template_data} and {launch_template_name} and {tag_specifications}")
+        launch_template_data = properties.get("LaunchTemplateData")
+        launch_template_name = properties.get("LaunchTemplateName")
 
-        launch_template = ec2_backend.create_launch_template(launch_template_data, launch_template_name, tag_specifications)
+        ec2_backend = ec2_backends[account_id][region_name]
+
+        launch_template = ec2_backend.create_launch_template(launch_template_name, launch_template_data)
         return launch_template
-
-ec2_backends = BackendDict(LaunchTemplateBackend, "ec2")
