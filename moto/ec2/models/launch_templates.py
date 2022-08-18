@@ -93,7 +93,7 @@ class LaunchTemplateBackend:
         self.launch_templates = OrderedDict()
         self.launch_template_insert_order = []
 
-    def create_launch_template(self, template_data, name, description=None):
+    def create_launch_template(self, name, template_data, description=None):
         if name in self.launch_template_name_to_ids:
             raise InvalidLaunchTemplateNameAlreadyExistsError()
         template = LaunchTemplate(self, name, template_data, description)
