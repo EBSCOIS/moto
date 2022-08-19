@@ -1210,7 +1210,7 @@ def test_update_stack_fail_update_same_template_body():
 
 
 @mock_cloudformation
-def test_boto3_update_stack_deleted_resources_can_reference_deleted_parameters():
+def test_update_stack_deleted_resources_can_reference_deleted_parameters
 
     name = "update_stack_deleted_resources_can_reference_deleted_parameters"
 
