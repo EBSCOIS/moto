@@ -139,12 +139,6 @@ class FakeLaunchTemplate(CloudFormationModel):
     def latest_version(self):
         return self.versions[-1]
 
-    def is_created(self):
-        # Verify whether the resource was created successfully
-        # Assume True after initialization
-        # Custom resources may need time after init before they are created successfully
-        return True
-
     @classmethod
     def create_from_cloudformation_json(
         cls, resource_name, cloudformation_json, account_id, region_name, **kwargs
