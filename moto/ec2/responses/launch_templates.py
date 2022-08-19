@@ -131,7 +131,7 @@ class LaunchTemplates(EC2BaseResponse):
                     "defaultVersionNumber": template.default_version_number,
                     "latestVersionNumber": version.number,
                     "launchTemplateId": template.id,
-                    "launchTemplateName": template.name,
+                    "launchTemplateName": template.launch_template_name,
                 },
             )
 
@@ -161,9 +161,9 @@ class LaunchTemplates(EC2BaseResponse):
                     "createTime": version.create_time,
                     "createdBy": f"arn:aws:iam::{self.current_account}:root",
                     "defaultVersion": template.is_default(version),
-                    "launchTemplateData": version.data,
+                    "launchTemplateData": template_data,
                     "launchTemplateId": template.id,
-                    "launchTemplateName": template.name,
+                    "launchTemplateName": template.launch_template_name,
                     "versionDescription": version.description,
                     "versionNumber": version.number,
                 },
@@ -184,7 +184,7 @@ class LaunchTemplates(EC2BaseResponse):
                 {
                     "defaultVersionNumber": template.default_version_number,
                     "launchTemplateId": template.id,
-                    "launchTemplateName": template.name,
+                    "launchTemplateName": template.launch_template_name,
                 },
             )
 
@@ -241,7 +241,6 @@ class LaunchTemplates(EC2BaseResponse):
                 ret_versions = template.versions
 
             ret_versions = ret_versions[:max_results]
-
             for version in ret_versions:
                 xml_serialize(
                     versions_node,
@@ -250,9 +249,9 @@ class LaunchTemplates(EC2BaseResponse):
                         "createTime": version.create_time,
                         "createdBy": f"arn:aws:iam::{self.current_account}:root",
                         "defaultVersion": True,
-                        "launchTemplateData": version.data,
+                        "launchTemplateData": template.tag_specifications,
                         "launchTemplateId": template.id,
-                        "launchTemplateName": template.name,
+                        "launchTemplateName": template.launch_template_name,
                         "versionDescription": version.description,
                         "versionNumber": version.number,
                     },
@@ -264,6 +263,7 @@ class LaunchTemplates(EC2BaseResponse):
         max_results = self._get_int_param("MaxResults", 15)
         template_names = self._get_multi_param("LaunchTemplateName")
         template_ids = self._get_multi_param("LaunchTemplateId")
+        template_data = self._get_multi_param("LaunchTemplateData")
         filters = self._filters_from_querystring()
 
         if self.is_not_dryrun("DescribeLaunchTemplates"):
@@ -288,7 +288,8 @@ class LaunchTemplates(EC2BaseResponse):
                         "defaultVersionNumber": template.default_version_number,
                         "latestVersionNumber": template.latest_version_number,
                         "launchTemplateId": template.id,
-                        "launchTemplateName": template.name,
+                        "launchTemplateName": template.launch_template_name,
+                        "launch_template_data": template.launch_template_data
                     },
                 )
 

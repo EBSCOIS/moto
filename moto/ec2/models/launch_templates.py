@@ -1,11 +1,10 @@
 from collections import OrderedDict
-from .core import CloudFormationModel
 from ..utils import generic_filter, random_launch_template_id, utc_date_and_time
 from ..exceptions import (
     InvalidLaunchTemplateNameAlreadyExistsError,
     InvalidLaunchTemplateNameNotFoundError,
 )
-
+from moto.core import CloudFormationModel
 
 class LaunchTemplateVersion(object):
     def __init__(self, template, number, data, description):
@@ -38,10 +37,10 @@ class LaunchTemplateBackend:
         self.launch_templates = OrderedDict()
         self.launch_template_insert_order = []
 
-    def create_launch_template(self, name, template_data, description=None):
+    def create_launch_template(self, name, template_data, tag_specifications, description=None):
         if name in self.launch_template_name_to_ids:
             raise InvalidLaunchTemplateNameAlreadyExistsError()
-        template = FakeLaunchTemplate(name, template_data, description)
+        template = FakeLaunchTemplate(name, template_data, tag_specifications, description)
         self.launch_templates[template.id] = template
         self.launch_template_name_to_ids[template.launch_template_name] = template.id
         self.launch_template_insert_order.append(template.id)
@@ -81,12 +80,14 @@ class LaunchTemplateBackend:
 
 
 class FakeLaunchTemplate(CloudFormationModel):
-    def __init__(self, launch_template_name, launch_template_data, description):
+    def __init__(self, launch_template_name, launch_template_data, tag_specifications, description):
         self.launch_template_data = launch_template_data
         self.launch_template_name = launch_template_name
+        self.tag_specifications = tag_specifications
         self.description = description
         self.id = random_launch_template_id()
         self.create_time = utc_date_and_time()
+
         self.versions = []
         self.create_version(launch_template_data, description)
         self.default_version_number = 1
@@ -139,12 +140,14 @@ class FakeLaunchTemplate(CloudFormationModel):
         from ..models import ec2_backends
 
         properties = cloudformation_json["Properties"]
+
         launch_template_data = properties.get("LaunchTemplateData")
         launch_template_name = properties.get("LaunchTemplateName")
+        tag_specifications = properties.get("TagSpecifications")
 
         ec2_backend = ec2_backends[account_id][region_name]
 
         launch_template = ec2_backend.create_launch_template(
-            launch_template_name, launch_template_data
+            launch_template_name, launch_template_data, tag_specifications
         )
         return launch_template

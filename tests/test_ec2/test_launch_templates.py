@@ -416,7 +416,6 @@ def test_create_launch_template_with_tag_spec():
         LaunchTemplateName=template_name, Versions=["1"]
     )
     version = resp["LaunchTemplateVersions"][0]
-
     version["LaunchTemplateData"].should.have.key("TagSpecifications")
     version["LaunchTemplateData"]["TagSpecifications"].should.have.length_of(1)
     version["LaunchTemplateData"]["TagSpecifications"][0].should.equal(
