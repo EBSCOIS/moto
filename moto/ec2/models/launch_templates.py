@@ -1,11 +1,10 @@
 from collections import OrderedDict
+from .core import CloudFormationModel
 from ..utils import generic_filter, random_launch_template_id, utc_date_and_time
 from ..exceptions import (
     InvalidLaunchTemplateNameAlreadyExistsError,
     InvalidLaunchTemplateNameNotFoundError,
 )
-
-from moto.core import CloudFormationModel
 
 
 class LaunchTemplateVersion(object):
