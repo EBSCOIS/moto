@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from .core import TaggedEC2Resource
 from ..utils import generic_filter, random_launch_template_id, utc_date_and_time
 from ..exceptions import (
     InvalidLaunchTemplateNameAlreadyExistsError,
@@ -83,12 +82,7 @@ class LaunchTemplateBackend:
 
 
 class FakeLaunchTemplate(CloudFormationModel):
-    def __init__(
-        self,
-        launch_template_name,
-        launch_template_data,
-        description
-    ):
+    def __init__(self, launch_template_name, launch_template_data, description):
         self.launch_template_data = launch_template_data
         self.launch_template_name = launch_template_name
         self.description = description
@@ -151,5 +145,7 @@ class FakeLaunchTemplate(CloudFormationModel):
 
         ec2_backend = ec2_backends[account_id][region_name]
 
-        launch_template = ec2_backend.create_launch_template(launch_template_name, launch_template_data)
+        launch_template = ec2_backend.create_launch_template(
+            launch_template_name, launch_template_data
+        )
         return launch_template
