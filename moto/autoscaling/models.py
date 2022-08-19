@@ -478,7 +478,7 @@ class FakeAutoScalingGroup(CloudFormationModel):
 
             if launch_template_id:
                 self.launch_template = self.ec2_backend.get_launch_template(
-                    launch_template_id
+                    launch_template_id.id
                 )
             elif launch_template_name:
                 self.launch_template = self.ec2_backend.get_launch_template_by_name(
